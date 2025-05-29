@@ -4,6 +4,7 @@ DECLARE @Month INT = 5;
 DECLARE @StartDate DATE = DATEFROMPARTS(@Year, @Month, 1);
 DECLARE @EndDate DATE = EOMONTH(@StartDate);
 
+
 WITH Dates AS (
     SELECT @StartDate AS CalendarDate
     UNION ALL
@@ -15,10 +16,13 @@ LabeledDates AS (
     SELECT
         CalendarDate,
         DATENAME(WEEKDAY, CalendarDate) AS DayName,
-        DATEPART(WEEK, CalendarDate) - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, @StartDate), 0)) + 1 AS WeekNum,
-        DATEPART(WEEKDAY, CalendarDate) AS WeekdayNum -- Sunday = 1 in default US settings
+        DATEPART(WEEK, CalendarDate) 
+            - DATEPART(WEEK, DATEADD(MONTH, DATEDIFF(MONTH, 0, @StartDate), 0)) 
+            + 1 AS WeekNum,
+        DATEPART(WEEKDAY, CalendarDate) AS WeekdayNum
     FROM Dates
 )
+
 
 SELECT
     MAX(CASE WHEN DATEPART(WEEKDAY, CalendarDate) = 1 THEN CalendarDate END) AS Sunday,
@@ -31,4 +35,6 @@ SELECT
 FROM LabeledDates
 GROUP BY WeekNum
 ORDER BY WeekNum
+
+
 OPTION (MAXRECURSION 1000);
